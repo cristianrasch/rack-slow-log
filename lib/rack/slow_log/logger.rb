@@ -31,6 +31,10 @@ module Rack
 
       private
 
+      def time_elapsed
+        @time_elapsed ||= @end_time - @start_time
+      end
+
       def long_request?
         (@end_time - @start_time) > @long_request_time
       end
@@ -38,9 +42,12 @@ module Rack
       def write_log
         log_file = ::File.open(log_file_name, 'a')
 
-        log_file.write("[#{@start_time}] >>>>>>>>>> START <<<<<<<<<<\n")
-        @lines.each { |timestamp, line| log_file.write("[#{timestamp}] #{line}\n") }
-        log_file.write("[#{@end_time}] >>>>>>>>>> END <<<<<<<<<<\n")
+        @lines.each do |timestamp, line|
+          log_file.write("[#{timestamp}] #{line} (#{time_elapsed.round(1)} ms)\n")
+        end
+        # log_file.write("[#{@start_time}] >>>>>>>>>> START <<<<<<<<<<\n")
+        # @lines.each { |timestamp, line| log_file.write("[#{timestamp}] #{line}\n") }
+        # log_file.write("[#{@end_time}] >>>>>>>>>> END <<<<<<<<<<\n")
 
         log_file.close
       end
